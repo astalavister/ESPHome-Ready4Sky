@@ -1,11 +1,11 @@
 #ifdef USE_ESP32
 
+#include "ready4sky.h"
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 #include "esphome/core/helpers.h"
 #include "esphome/core/hal.h"
 #include "esphome/core/time.h"
-#include "ready4sky.h"
 
 #include <nvs_flash.h>
 #include <esp_bt_main.h>
@@ -300,7 +300,7 @@ void R4SEngine::gap_event_handler_( esp_gap_ble_cb_event_t event, esp_ble_gap_cb
                   nsd.name.c_str(), global_r4s_engine->address_str(nsd.address).c_str(), nsd.rssi);
           }
 //          if(global_r4s_engine->new_scan_dev_.size() > 3)
-            global_r4s_engine->new_scan_dev_.empty();
+            global_r4s_engine->new_scan_dev_.clear();
         }
         global_r4s_engine->start_scan();
         break;
@@ -351,7 +351,7 @@ void R4SEngine::gattc_event_handler_( esp_gattc_cb_event_t event, esp_gatt_if_t 
 
 void R4SEngine::dump_config() {
   ESP_LOGCONFIG(TAG, "Ready4Sky:");
-  ESP_LOGCONFIG(TAG, "  Scan Duration: %u s", this->scan_duration_);
+  ESP_LOGCONFIG(TAG, "  Scan Duration: %lu s", this->scan_duration_);
   ESP_LOGCONFIG(TAG, "  Scan Interval: %.1f ms", this->scan_params_.scan_interval * 0.625f);
   ESP_LOGCONFIG(TAG, "  Scan Window: %.1f ms", this->scan_params_.scan_window * 0.625f);
   ESP_LOGCONFIG(TAG, "  Scan Type: %s", this->scan_params_.scan_type ? "ACTIVE" : "PASSIVE");
@@ -618,7 +618,7 @@ std::string R4SDriver::uuid_to_string(esp_bt_uuid_t ud) {
       sprintf(sbuf, "0x%02X%02X", ud.uuid.uuid16 >> 8, ud.uuid.uuid16 & 0xff);
       break;
     case ESP_UUID_LEN_32:
-      sprintf(sbuf, "0x%02X%02X%02X%02X", ud.uuid.uuid32 >> 24, (ud.uuid.uuid32 >> 16 & 0xff),
+      sprintf(sbuf, "0x%02lX%02lX%02lX%02lX", ud.uuid.uuid32 >> 24, (ud.uuid.uuid32 >> 16 & 0xff),
               (ud.uuid.uuid32 >> 8 & 0xff), ud.uuid.uuid32 & 0xff);
       break;
     default:
@@ -640,3 +640,6 @@ std::string R4SDriver::uuid_to_string(esp_bt_uuid_t ud) {
 }  // namespace esphome
 
 #endif
+
+
+

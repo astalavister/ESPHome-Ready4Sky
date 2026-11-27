@@ -170,7 +170,7 @@ CONFIG_SCHEMA = (
                 state_class=STATE_CLASS_MEASUREMENT,
                 unit_of_measurement="ml",
             ),
-            cv.Optional(CONF_STATUS_INDICATOR): text_sensor.TEXT_SENSOR_SCHEMA.extend(
+            cv.Optional(CONF_STATUS_INDICATOR): text_sensor.text_sensor_schema().extend(
               {
                 cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
                 cv.Optional(CONF_ICON, default=ICON_NEW_BOX): cv.icon,
@@ -195,9 +195,8 @@ CONFIG_SCHEMA = (
               SkyKettleBeeperSwitch,
               icon = "mdi:volume-high",
             ),
-            cv.Optional(CONF_TARGET_TEMP): number.NUMBER_SCHEMA.extend(
+            cv.Optional(CONF_TARGET_TEMP): number.number_schema(SkyKettleTargetNumber).extend(
               {
-                cv.GenerateID(): cv.declare_id(SkyKettleTargetNumber),
                 cv.Optional(CONF_ICON, default="mdi:thermometer-lines"): cv.icon,
                 cv.Optional(CONF_ACCURACY_DECIMALS, default='0'): cv.int_range(min=0, max=2),
                 cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=UNIT_CELSIUS): cv.string_strict,
@@ -205,9 +204,8 @@ CONFIG_SCHEMA = (
                 cv.Optional(CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_NONE): cv.entity_category,
               }
             ),
-            cv.Optional(CONF_BOIL_TIME_ADJ): number.NUMBER_SCHEMA.extend(
+            cv.Optional(CONF_BOIL_TIME_ADJ): number.number_schema(SkyKettleBoilTimeAdjNumber).extend(
               {
-                cv.GenerateID(): cv.declare_id(SkyKettleBoilTimeAdjNumber),
                 cv.Optional(CONF_ICON, default="mdi:timeline-clock"): cv.icon,
                 cv.Optional(CONF_ACCURACY_DECIMALS, default='0'): cv.int_range(min=0, max=2),
                 cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=UNIT_EMPTY): cv.string_strict,
@@ -297,4 +295,9 @@ async def to_code(config):
     if CONF_BOIL_TIME_ADJ in params:
       numb = await number.new_number(params[CONF_BOIL_TIME_ADJ], min_value=-5, max_value=5, step=1)
       cg.add(numb.set_parent(var))
+
       cg.add(var.set_boil_time_adj(numb))
+
+
+
+

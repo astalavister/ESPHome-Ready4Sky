@@ -1,6 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import time
+from esphome.components.esp32 import add_idf_sdkconfig_option, const, get_esp32_variant
 from esphome.const import (
   CONF_ID,
   CONF_INTERVAL,
@@ -88,6 +89,6 @@ async def to_code(config):
     cg.add(var.set_scan_parameters(int(params[CONF_INTERVAL].total_milliseconds/0.625), int(params[CONF_WINDOW].total_milliseconds/0.625)))
     cg.add(var.set_monitor(params[CONF_MONITOR]))
     
-    if CORE.using_esp_idf:
+    if CORE.is_esp32:
         add_idf_sdkconfig_option("CONFIG_BT_ENABLED", True)
     

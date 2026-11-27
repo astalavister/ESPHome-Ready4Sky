@@ -1,7 +1,5 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.log import color, Fore
-from esphome.util import safe_print
 from esphome.components import(
   ready4sky,
   switch,
@@ -129,9 +127,9 @@ def validate_control_parameters(config):
     if CONF_TEMPERATURE in prmi:
       npr = CONF_TEMPERATURE
   elif mdl == 2:
-    if CONF_WARM_STEAM in prms:
+    if CONF_WARM_STEAM in prmc:
       npr = CONF_WARM_STEAM
-    if CONF_DEW_MODE in prms:
+    if CONF_DEW_MODE in prmc:
       npr = CONF_DEW_MODE
     
   if not npr == "":
@@ -194,7 +192,7 @@ CONFIG_SCHEMA = cv.All(
                 entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
                 unit_of_measurement=UNIT_HOUR,
             ),
-            cv.Optional(CONF_STATUS_INDICATOR): text_sensor.TEXT_SENSOR_SCHEMA.extend(
+            cv.Optional(CONF_STATUS_INDICATOR): text_sensor.text_sensor_schema().extend(
               {
                 cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
                 cv.Optional(CONF_ICON, default=ICON_NEW_BOX): cv.icon,
@@ -227,9 +225,8 @@ CONFIG_SCHEMA = cv.All(
               SkyDewWarmSteamSwitch,
               icon = "mdi:heat-wave",
             ),
-            cv.Optional(CONF_TARGET_HUMIDITY): number.NUMBER_SCHEMA.extend(
+            cv.Optional(CONF_TARGET_HUMIDITY): number.number_schema(SkyDewTargetHumidityNumber).extend(
               {
-                cv.GenerateID(): cv.declare_id(SkyDewTargetHumidityNumber),
                 cv.Optional(CONF_ICON, default="mdi:cloud-percent"): cv.icon,
                 cv.Optional(CONF_ACCURACY_DECIMALS, default='0'): cv.int_range(min=0, max=2),
                 cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=UNIT_PERCENT): cv.string_strict,
@@ -237,9 +234,8 @@ CONFIG_SCHEMA = cv.All(
                 cv.Optional(CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG): cv.entity_category,
               }
             ),
-            cv.Optional(CONF_STEAM_LEVEL): number.NUMBER_SCHEMA.extend(
+            cv.Optional(CONF_STEAM_LEVEL): number.number_schema(SkyDewSteamLevelNumber).extend(
               {
-                cv.GenerateID(): cv.declare_id(SkyDewSteamLevelNumber),
                 cv.Optional(CONF_ICON, default="mdi:soundcloud"): cv.icon,
                 cv.Optional(CONF_ACCURACY_DECIMALS, default='0'): cv.int_range(min=0, max=2),
                 cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=UNIT_EMPTY): cv.string_strict,
@@ -247,11 +243,7 @@ CONFIG_SCHEMA = cv.All(
                 cv.Optional(CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG): cv.entity_category,
               }
             ),
-            cv.Optional(CONF_DEW_MODE): select.SELECT_SCHEMA.extend(
-              {
-                  cv.GenerateID(): cv.declare_id(SkyDewModeSelect),
-              }
-            ),
+            cv.Optional(CONF_DEW_MODE): select.select_schema(SkyDewModeSelect),
           }
         ),
       ), 
@@ -338,4 +330,7 @@ async def to_code(config):
     conf = params[CONF_DEW_MODE]
     selct = cg.new_Pvariable(conf[CONF_ID], var)
     await select.register_select(selct, conf, options=omd)
+
     cg.add(var.set_mode(selct))
+
+

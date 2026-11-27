@@ -81,7 +81,7 @@ MODEL_TYPE = {
   "RMC-M224S":  7,  "RFS-KMC001":   7,
   "RMC-M225S":  7,  "RMC-M225S-E":  7,
   "RMC-M226S":  7,  "RMC-M226S-E":  7,  "JK-MC501":   7,  "NK-MC10":  7,  
-  "RMC-M227S":  7,
+  "RMC-M227S":  7,  "RFS-KMC004":   7,
   "RMC-M800S":  0,
   "RMC-M903S":  5,  "RFS-KMC005":   5,
   "RMC-961S":   4,
@@ -381,7 +381,7 @@ CONFIG_SCHEMA = (
       cv.Optional(CONF_INFORM): cv.All(
         cv.Schema(
           {
-            cv.Optional(CONF_STATUS_INDICATOR): text_sensor.TEXT_SENSOR_SCHEMA.extend(
+            cv.Optional(CONF_STATUS_INDICATOR): text_sensor.text_sensor_schema().extend(
               {
                 cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
                 cv.Optional(CONF_ICON, default=ICON_NEW_BOX): cv.icon,
@@ -406,11 +406,7 @@ CONFIG_SCHEMA = (
               SkyCookerPowerSwitch,
               icon = ICON_COOKER,
             ),
-            cv.Required(CONF_COOKING_MODE): select.SELECT_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(SkyCookerModeSelect),
-                }
-            ),
+            cv.Required(CONF_COOKING_MODE): select.select_schema(SkyCookerModeSelect),
             cv.Optional(CONF_POSTHEATING): switch.switch_schema(
               SkyCookerPostHeatSwitch,
               icon = "mdi:heat-wave",
@@ -419,14 +415,9 @@ CONFIG_SCHEMA = (
               SkyCookerTimerModeSwitch,
               icon = "mdi:progress-clock",
             ),
-            cv.Optional(CONF_COOKING_PRODUCT): select.SELECT_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(SkyCookerSubModeSelect),
-                }
-            ),
-            cv.Optional(CONF_TEMPERATURE_SETTING): number.NUMBER_SCHEMA.extend(
+            cv.Optional(CONF_COOKING_PRODUCT): select.select_schema(SkyCookerSubModeSelect),
+            cv.Optional(CONF_TEMPERATURE_SETTING): number.number_schema(SkyCookerTemperatureNumber).extend(
               {
-                cv.GenerateID(): cv.declare_id(SkyCookerTemperatureNumber),
                 cv.Optional(CONF_ICON, default="mdi:thermometer-lines"): cv.icon,
                 cv.Optional(CONF_ACCURACY_DECIMALS, default='0'): cv.int_range(min=0, max=2),
                 cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=UNIT_CELSIUS): cv.string_strict,
@@ -434,9 +425,8 @@ CONFIG_SCHEMA = (
                 cv.Optional(CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG): cv.entity_category,
               }
             ),
-            cv.Optional(CONF_TIMER_HOURS_SETTING): number.NUMBER_SCHEMA.extend(
+            cv.Optional(CONF_TIMER_HOURS_SETTING): number.number_schema(SkyCookerTimerHoursNumber).extend(
               {
-                cv.GenerateID(): cv.declare_id(SkyCookerTimerHoursNumber),
                 cv.Optional(CONF_ICON, default="mdi:timer-settings"): cv.icon,
                 cv.Optional(CONF_ACCURACY_DECIMALS, default='0'): cv.int_range(min=0, max=2),
                 cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=UNIT_HOUR): cv.string_strict,
@@ -444,9 +434,8 @@ CONFIG_SCHEMA = (
                 cv.Optional(CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG): cv.entity_category,
               }
             ),
-            cv.Optional(CONF_TIMER_MINUTES_SETTING): number.NUMBER_SCHEMA.extend(
+            cv.Optional(CONF_TIMER_MINUTES_SETTING): number.number_schema(SkyCookerTimerMinutesNumber).extend(
               {
-                cv.GenerateID(): cv.declare_id(SkyCookerTimerMinutesNumber),
                 cv.Optional(CONF_ICON, default="mdi:timer-settings"): cv.icon,
                 cv.Optional(CONF_ACCURACY_DECIMALS, default='0'): cv.int_range(min=0, max=2),
                 cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=UNIT_MINUTE): cv.string_strict,
@@ -537,4 +526,7 @@ async def to_code(config):
     await switch.register_switch(swtch, conf)
     cg.add(var.set_timer_mode(swtch))
 
+
     
+
+
